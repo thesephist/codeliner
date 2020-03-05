@@ -30,11 +30,10 @@ Yellow := [20, 225, 255]
 repeat := (s, count) => (sub := (acc, n) => n :: {
 	0 -> acc
 	_ -> sub(acc.len(acc) := s, n - 1)
-})('', count)
-repeatList := (list, count) => (sub := (acc, n) => n :: {
-	0 -> acc
-	_ -> sub(acc.len(acc) := list, n - 1)
-})([], count)
+})(type(s) :: {
+	'string' -> ''
+	'composite' -> []
+}, count)
 
 ` given a character byte, determine which color to use to display it `
 byteToRGB := b => b :: {
@@ -68,8 +67,8 @@ generate := txt => (
 	linesOfPixels := map(equalizedLines, line => (
 		bytes := split(line, '')
 		singleRow := flatten(map(bytes, byteToRGB))
-		singleRow := flatten(map(bytes, b => repeatList(byteToRGB(b), Scale)))
-		flatten(repeatList(singleRow, Scale * 2))
+		singleRow := flatten(map(bytes, b => repeat(byteToRGB(b), Scale)))
+		flatten(repeat(singleRow, Scale * 2))
 	))
 
 	` our bmp library starts writing from bottom left corner,
