@@ -20,14 +20,12 @@ file := args().2 :: {
 		readFile(file, data => data :: {
 			() -> log(f('Could not read contents of "{{ path }}"', {path: file}))
 			_ -> (
-				result := gen(data)
-				log('Generated!')
-
 				outpath := (args().3 :: {
 					() -> 'out.bmp'
 					_ -> string(args().3)
 				})
 
+				result := gen(data)
 				writeFile(outpath, result, result => result :: {
 					true -> log(f('Generated! Saved to "{{ path }}"', {path: outpath}))
 					_ -> log('Output write failed')

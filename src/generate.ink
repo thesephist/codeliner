@@ -10,18 +10,23 @@ reduce := std.reduce
 max := std.max
 join := std.join
 flatten := std.flatten
+reverse := std.reverse
 
 replace := str.replace
 split := str.split
 
-Scale := 2
+Scale := 3
 
 Tab := char(9)
 Newline := char(10)
 
 Black := [0, 0, 0]
 White := [255, 255, 255]
+Blue := [255, 20, 20]
+Red := [20, 20, 255]
+Yellow := [20, 225, 255]
 
+` repeat strings and lists N times `
 repeat := (s, count) => (sub := (acc, n) => n :: {
 	0 -> acc
 	_ -> sub(acc.len(acc) := s, n - 1)
@@ -31,9 +36,19 @@ repeatList := (list, count) => (sub := (acc, n) => n :: {
 	_ -> sub(acc.len(acc) := list, n - 1)
 })([], count)
 
+` given a character byte, determine which color to use to display it `
 byteToRGB := b => b :: {
-	' ' -> repeatList(White, Scale)
-	_ -> repeatList(Black, Scale)
+	' ' -> White
+
+	'(' -> Blue
+	')' -> Blue
+
+	'[' -> Red
+	']' -> Red
+	'{' -> Yellow
+	'}' -> Yellow
+
+	_ -> Black
 }
 
 generate := txt => (
@@ -53,12 +68,16 @@ generate := txt => (
 	linesOfPixels := map(equalizedLines, line => (
 		bytes := split(line, '')
 		singleRow := flatten(map(bytes, byteToRGB))
+		singleRow := flatten(map(bytes, b => repeatList(byteToRGB(b), Scale)))
 		flatten(repeatList(singleRow, Scale * 2))
 	))
-	pixels := flatten(linesOfPixels)
 
-	log(width * height)
-	log(len(pixels))
+	` our bmp library starts writing from bottom left corner,
+		so we need to reverse the list to show in correct line order `
+	pixels := flatten(reverse(linesOfPixels))
 
-	bmp(width, height, pixels)
+	width * height :: {
+		len(pixels) -> bmp(width, height, pixels)
+		_ -> 'error: generated invalid image dimensions'
+	}
 )
