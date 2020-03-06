@@ -59,14 +59,11 @@ generate := txt => (
 		true -> s + repeat(' ', maxLineLength - len(s))
 	})
 
-	(std.cat)(equalizedLines, Newline)
-
 	width := maxLineLength * Scale
 	height := len(equalizedLines) * Scale * 2
 
 	linesOfPixels := map(equalizedLines, line => (
 		bytes := split(line, '')
-		singleRow := flatten(map(bytes, byteToRGB))
 		singleRow := flatten(map(bytes, b => repeat(byteToRGB(b), Scale)))
 		flatten(repeat(singleRow, Scale * 2))
 	))
